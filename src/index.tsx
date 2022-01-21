@@ -1,51 +1,72 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, createRef } from 'react'
 
-interface Props {
-  stories: string[]
-  animatedBubble?: boolean
-  bubbleSize?: number
-  color?: string
-  hideTitle?: boolean
-  showPlayIcon?: boolean
-  autoStartWithSound?: boolean
-  titleFontColor?: string
+declare global {
+  const gobi: {
+    Bubbles: {
+      new (config: any): any;
+    };
+    discover: () => void;
+  };
 }
 
-const GobiReact = ({
-  stories,
-  animatedBubble = true,
-  bubbleSize = 125,
-  color = '#15D6EA',
-  hideTitle = false,
-  showPlayIcon = true,
-  autoStartWithSound = true,
-  titleFontColor = '#000'
-}: Props) => {
-  const random = Math.random()
-  useEffect(() => {
-    const script = document.createElement('script')
-    document.head.append(script)
-    script.src = 'https://unpkg.com/@gobistories/gobi-web-integration@^6.11.1'
-    script.async = true
-    script.setAttribute('onload', 'gobi.discover()')
-    const gobi = document.getElementById(`gobi-${random}`)
-    if (gobi) {
-      gobi.innerHTML = `<div
-        class="gobi-stories"
-        data-gobi-stories="${stories?.toString()?.replace(',', ' ')}"
-        data-gobi-color="${color}"
-        data-gobi-bubble-size="${bubbleSize}px"
-        data-gobi-animated-bubble="${animatedBubble?.toString()}"
-        data-gobi-show-play-icon="${showPlayIcon?.toString()}"
-        data-gobi-auto-segue="true"
-        data-gobi-title-font-color="${titleFontColor}"
-        data-gobi-hide-title="${hideTitle}"
-        data-gobi-auto-start-with-sound="${autoStartWithSound}">
-      </div>`
+const bubbleDefaults = {
+  animatedBubble: true,
+  bubbleSize: 125,
+  color: '#15D6EA',
+  hideTitle: false,
+  showPlayIcon: false,
+  playIconUrl: '',
+  autoStartWithSound: true,
+  titleFontColor: '#000',
+  align: 'center',
+  autoSegue: false,
+  fullScreenPlayer: false,
+  noShade: false,
+  disableShadowDom: true,
+};
+type BubbleDefaults = typeof bubbleDefaults;
+
+type Props = Partial<BubbleDefaults> & { stories: string[] };
+
+const GobiReact = (props: Props) => {
+  const ref = createRef<HTMLDivElement>();
+
+  const createEmbed = () => {
+    if (!ref.current) {
+      return;
     }
+    // discover() doesn't work with react elements, so create a raw HTMLElement
+    ref.current.innerHTML = `<div class="gobi-stories"></div>`;
+
+    const config = {
+      ...bubbleDefaults,
+      ...props
+    };
+
+    new gobi.Bubbles({
+      ...config,
+      playerOptions: {
+        autoStartWithSound: config.autoStartWithSound,
+      },
+      container: ref.current.firstElementChild,
+      stories: props.stories.map((viewKey) => ({ id: viewKey })),
+      bubbleSize: `${props.bubbleSize}px`,
+    });
+  };
+
+  useEffect(() => {
+    if ("undefined" !== typeof gobi) {
+      createEmbed();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.addEventListener("load", createEmbed);
+    script.setAttribute("src", 'https://unpkg.com/@gobistories/gobi-web-integration@^6');
+    document.head.appendChild(script);
   }, [])
 
-  return <div id={`gobi-${random}`} />
+  return <div ref={ref} />
 }
 
 export { GobiReact }
