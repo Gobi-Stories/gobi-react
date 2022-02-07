@@ -2,6 +2,10 @@
 
 [![NPM](https://img.shields.io/npm/v/gobi-react.svg)](https://www.npmjs.com/package/gobi-react) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+## Deprecation warning
+
+Please use https://www.npmjs.com/package/@gobistories/gobi-react instead of https://www.npmjs.com/package/gobi-react that has been deprecated
+
 ## Install
 
 ```bash
