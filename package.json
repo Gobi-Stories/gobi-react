@@ -1,10 +1,10 @@
 {
-  "name": "gobi-react",
-  "version": "1.0.0",
+  "name": "@gobistories/gobi-react",
+  "version": "1.0.3",
   "description": "Gobi Stories React library",
   "author": "gobi",
   "license": "MIT",
-  "repository": "gobi/gobi-react",
+  "repository": "Gobi-Technologies/gobi-react",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.tsx",
